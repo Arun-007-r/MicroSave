@@ -35,7 +35,8 @@ public class MemberService {
     public Member addMember(Long groupId, Member member) {
 
         Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new RuntimeException("Group not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Group not found"));
 
         member.setGroup(group);
 
@@ -46,21 +47,35 @@ public class MemberService {
         return memberRepository.findAll();
     }
 
+    public List<Member> getMembersByGroup(Long groupId) {
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() ->
+                        new RuntimeException("Group not found"));
+
+        return memberRepository.findByGroup(group);
+    }
+
     public Member getMemberById(Long id) {
+
         return memberRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Member not found"));
     }
 
     public MemberSummary getMemberSummary(Long memberId) {
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Member not found"));
 
         BigDecimal totalSavings =
-                contributionRepository.getTotalContributionsByMember(member);
+                contributionRepository
+                        .getTotalContributionsByMember(member);
 
         BigDecimal outstandingLoan =
-                loanRepository.getOutstandingLoanByMember(member);
+                loanRepository
+                        .getOutstandingLoanByMember(member);
 
         return new MemberSummary(
                 member.getId(),

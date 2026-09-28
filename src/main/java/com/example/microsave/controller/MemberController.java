@@ -17,7 +17,6 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    // Add a member to a group
     @PostMapping("/group/{groupId}")
     public Member addMember(
             @PathVariable Long groupId,
@@ -26,21 +25,29 @@ public class MemberController {
         return memberService.addMember(groupId, member);
     }
 
-    // Get all members
     @GetMapping
     public List<Member> getAllMembers() {
         return memberService.getAllMembers();
     }
 
-    // Get member by ID
+    @GetMapping("/group/{groupId}")
+    public List<Member> getMembersByGroup(
+            @PathVariable Long groupId) {
+
+        return memberService.getMembersByGroup(groupId);
+    }
+
     @GetMapping("/{id}")
-    public Member getMemberById(@PathVariable Long id) {
+    public Member getMemberById(
+            @PathVariable Long id) {
+
         return memberService.getMemberById(id);
     }
 
-    // Get member savings and outstanding loan
     @GetMapping("/{id}/summary")
-    public MemberSummary getMemberSummary(@PathVariable Long id) {
+    public MemberSummary getMemberSummary(
+            @PathVariable Long id) {
+
         return memberService.getMemberSummary(id);
     }
 }
