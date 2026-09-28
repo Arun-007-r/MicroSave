@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MicroSave</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #263238;
+        }
+
+        header {
+            background: #1b5e20;
+            color: white;
+            padding: 22px 40px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        header p {
+            margin: 5px 0 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #1b5e20;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .summary-card h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+        }
+
+        .summary-card p {
+            margin: 0;
+            font-size: 25px;
+            font-weight: bold;
+            color: #1b5e20;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        button {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background: #1b5e20;
+        }
+
+        .danger {
+            background: #c62828;
+        }
+
+        .danger:hover {
+            background: #8e0000;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #e8f5e9;
+        }
+
+        .refresh {
+            background: #1565c0;
+        }
+
+        .refresh:hover {
+            background: #0d47a1;
+        }
+
+        @media (max-width: 768px) {
+            .summary-grid,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>MicroSave</h1>
+    <p>Community Savings and Loan Management System</p>
+</header>
+
+<div class="container">
+
+    <div id="message" class="message"></div>
+
+    <!-- ================= GROUP ================= -->
+
+    <div class="card">
+
+        <h2>Create Group</h2>
+
+        <div class="form-grid">
+
+            <div>
+                <label>Group Name</label>
+                <input
+                    type="text"
+                    id="groupNameInput"
+                    placeholder="Enter group name">
+            </div>
+
+        </div>
+
+        <button onclick="createGroup()">
+            Create Group
+        </button>
+
+    </div>
+
+
+    <!-- ================= SELECT GROUP ================= -->
+
+    <div class="card">
+
+        <h2>Current Group</h2>
+
+        <label>Group ID</label>
+
+        <input
+            type="number"
+            id="groupIdInput"
+            placeholder="Enter Group ID"
+            value="1">
+
+        <button onclick="loadDashboard()">
+            Load Group
+        </button>
+
+    </div>
+
+
+    <!-- ================= GROUP INFORMATION ================= -->
+
+    <div class="card">
+
+        <h2 id="groupName">
+            Group
+        </h2>
+
+        <p>
+            Group ID:
+            <strong id="groupId">-</strong>
+        </p>
+
+    </div>
+
+
+    <!-- ================= SUMMARY ================= -->
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+
+            <h3>Total Savings</h3>
+
+            <p id="totalSavings">
+                ₹0.00
+            </p>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <h3>Outstanding Loans</h3>
+
+            <p id="outstandingLoans">
+                ₹0.00
+            </p>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <h3>Available Pool</h3>
+
+            <p id="availablePool">
+                ₹0.00
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= ADD MEMBER ================= -->
+
+    <div class="card">
+
+        <h2>Add Member</h2>
+
+        <div class="form-grid">
+
+            <div>
+
+                <label>Member Name</label>
+
+                <input
+                    type="text"
+                    id="memberNameInput"
+                    placeholder="Enter member name">
+
+            </div>
+
+        </div>
+
+        <button onclick="addMember()">
+            Add Member
+        </button>
+
+    </div>
+
+
+    <!-- ================= MEMBERS ================= -->
+
+    <div class="card">
+
+        <h2>Group Members</h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Group</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="memberTable">
+
+                <tr>
+                    <td colspan="3">
+                        No members loaded
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- ================= CONTRIBUTION ================= -->
+
+    <div class="card">
+
+        <h2>Add Contribution</h2>
+
+        <div class="form-grid">
+
+            <div>
+
+                <label>Member</label>
+
+                <select id="contributionMember">
+                    <option value="">
+                        Select Member
+                    </option>
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label>Amount</label>
+
+                <input
+                    type="number"
+                    id="contributionAmount"
+                    min="1"
+                    step="0.01"
+                    placeholder="Enter amount">
+
+            </div>
+
+        </div>
+
+        <button onclick="addContribution()">
+            Add Contribution
+        </button>
+
+    </div>
+
+
+    <!-- ================= LOAN ================= -->
+
+    <div class="card">
+
+        <h2>Request Loan</h2>
+
+        <div class="form-grid">
+
+            <div>
+
+                <label>Member</label>
+
+                <select id="loanMember">
+                    <option value="">
+                        Select Member
+                    </option>
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label>Loan Amount</label>
+
+                <input
+                    type="number"
+                    id="loanAmount"
+                    min="1"
+                    step="0.01"
+                    placeholder="Enter loan amount">
+
+            </div>
+
+        </div>
+
+        <button onclick="requestLoan()">
+            Request Loan
+        </button>
+
+    </div>
+
+
+    <!-- ================= LOANS ================= -->
+
+    <div class="card">
+
+        <h2>Group Loans</h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Loan ID</th>
+                    <th>Member</th>
+                    <th>Amount</th>
+                    <th>Outstanding</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="loanTable">
+
+                <tr>
+                    <td colspan="4">
+                        No loans loaded
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- ================= REPAYMENT ================= -->
+
+    <div class="card">
+
+        <h2>Repay Loan</h2>
+
+        <div class="form-grid">
+
+            <div>
+
+                <label>Loan</label>
+
+                <select id="repaymentLoan">
+
+                    <option value="">
+                        Select Loan
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label>Repayment Amount</label>
+
+                <input
+                    type="number"
+                    id="repaymentAmount"
+                    min="1"
+                    step="0.01"
+                    placeholder="Enter amount">
+
+            </div>
+
+        </div>
+
+        <button onclick="repayLoan()">
+            Make Repayment
+        </button>
+
+    </div>
+
+
+    <!-- ================= REFRESH ================= -->
+
+    <div class="card">
+
+        <button
+            class="refresh"
+            onclick="loadDashboard()">
+
+            Refresh Dashboard
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // =====================================================
+    // GET CURRENT GROUP ID
+    // =====================================================
+
+    function getGroupId() {
+
+        return document.getElementById("groupIdInput").value;
+
+    }
+
+
+    // =====================================================
+    // MESSAGE
+    // =====================================================
+
+    function showMessage(text, success) {
+
+        const message =
+            document.getElementById("message");
+
+        message.textContent = text;
+
+        message.className =
+            success
+                ? "message success"
+                : "message error";
+
+        message.style.display = "block";
+
+        setTimeout(() => {
+
+            message.style.display = "none";
+
+        }, 4000);
+
+    }
+
+
+    // =====================================================
+    // CREATE GROUP
+    // =====================================================
+
+    async function createGroup() {
+
+        const name =
+            document.getElementById("groupNameInput").value.trim();
+
+        if (!name) {
+
+            showMessage(
+                "Please enter a group name.",
+                false
+            );
+
+            return;
+        }
+
+        try {
+
+            const response = await fetch("/groups", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    name: name
+                })
+
+            });
+
+
+            if (!response.ok) {
+
+                const error =
+                    await response.json();
+
+                throw new Error(
+                    error.error || "Unable to create group"
+                );
+
+            }
+
+
+            const group =
+                await response.json();
+
+
+            document.getElementById("groupIdInput").value =
+                group.id;
+
+            showMessage(
+                "Group created successfully.",
+                true
+            );
+
+            document.getElementById("groupNameInput").value = "";
+
+            loadDashboard();
+
+        }
+
+        catch (error) {
+
+            showMessage(
+                error.message,
+                false
+            );
+
+        }
+
+    }
+
+
+    // =====================================================
+    // ADD MEMBER
+    // =====================================================
+
+    async function addMember() {
+
+        const groupId =
+            getGroupId();
+
+        const name =
+            document.getElementById("memberNameInput").value.trim();
+
+
+        if (!groupId) {
+
+            showMessage(
+                "Please select a group.",
+                false
+            );
+
+            return;
+        }
+
+
+        if (!name) {
+
+            showMessage(
+                "Please enter member name.",
+                false
+            );
+
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `/members/group/${groupId}`,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            name: name
+                        })
+
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                const error =
+                    await response.json();
+
+                throw new Error(
+                    error.error || "Unable to add member"
+                );
+
+            }
+
+
+            await response.json();
+
+
+            showMessage(
+                "Member added successfully.",
+                true
+            );
+
+
+            document.getElementById(
+                "memberNameInput"
+            ).value = "";
+
+
+            loadDashboard();
+
+        }
+
+        catch (error) {
+
+            showMessage(
+                error.message,
+                false
+            );
+
+        }
+
+    }
+
+
+    // =====================================================
+    // LOAD DASHBOARD
+    // =====================================================
+
+    async function loadDashboard() {
+
+        const groupId =
+            getGroupId();
+
+
+        if (!groupId) {
+
+            showMessage(
+                "Please enter a group ID.",
+                false
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            // GROUP
+
+            const groupResponse =
+                await fetch(`/groups/${groupId}`);
+
+
+            if (!groupResponse.ok) {
+
+                throw new Error(
+                    "Group not found"
+                );
+
+            }
+
+
+            const group =
+                await groupResponse.json();
+
+
+            document.getElementById("groupName")
+                .textContent = group.name;
+
+
+            document.getElementById("groupId")
+                .textContent = group.id;
+
+
+            // SUMMARY
+
+            const summaryResponse =
+                await fetch(
+                    `/groups/${groupId}/summary`
+                );
+
+
+            const summary =
+                await summaryResponse.json();
+
+
+            const savings =
+                Number(summary.totalSavings);
+
+
+            const loans =
+                Number(summary.outstandingLoans);
+
+
+            const pool =
+                savings - loans;
+
+
+            document.getElementById("totalSavings")
+                .textContent =
+                `₹${savings.toFixed(2)}`;
+
+
+            document.getElementById("outstandingLoans")
+                .textContent =
+                `₹${loans.toFixed(2)}`;
+
+
+            document.getElementById("availablePool")
+                .textContent =
+                `₹${pool.toFixed(2)}`;
+
+
+            // MEMBERS
+
+            await loadMembers();
+
+
+            // LOANS
+
+            await loadLoans();
+
+        }
+
+        catch (error) {
+
+            showMessage(
+                error.message,
+                false
+            );
+
+        }
+
+    }
+
+
+    // =====================================================
+    // LOAD MEMBERS
+    // =====================================================
+
+    async function loadMembers() {
+
+        const groupId =
+            getGroupId();
+
+
+        const response =
+            await fetch("/members");
+
+
+        const members =
+            await response.json();
+
+
+        const table =
+            document.getElementById("memberTable");
+
+
+        const contributionSelect =
+            document.getElementById(
+                "contributionMember"
+            );
+
+
+        const loanSelect =
+            document.getElementById(
+                "loanMember"
+            );
+
+
+        table.innerHTML = "";
+
+        contributionSelect.innerHTML =
+            `<option value="">Select Member</option>`;
+
+        loanSelect.innerHTML =
+            `<option value="">Select Member</option>`;
+
+
+        const groupMembers =
+            members.filter(
+                member =>
+                    member.group &&
+                    member.group.id == groupId
+            );
+
+
+        groupMembers.forEach(member => {
+
+
+            const row =
+                document.createElement("tr");
+
+
+            row.innerHTML = `
+
+                <td>${member.id}</td>
+
+                <td>${member.name}</td>
+
+                <td>${member.group.name}</td>
+
+            `;
+
+
+            table.appendChild(row);
+
+
+            contributionSelect.innerHTML += `
+
+                <option value="${member.id}">
+                    ${member.name}
+                </option>
+
+            `;
+
+
+            loanSelect.innerHTML += `
+
+                <option value="${member.id}">
+                    ${member.name}
+                </option>
+
+            `;
+
+        });
+
+
+        if (groupMembers.length === 0) {
+
+            table.innerHTML = `
+
+                <tr>
+                    <td colspan="3">
+                        No members found
+                    </td>
+                </tr>
+
+            `;
+
+        }
+
+    }
+
+
+    // =====================================================
+    // ADD CONTRIBUTION
+    // =====================================================
+
+    async function addContribution() {
+
+        const memberId =
+            document.getElementById(
+                "contributionMember"
+            ).value;
+
+
+        const amount =
+            document.getElementById(
+                "contributionAmount"
+            ).value;
+
+
+        if (!memberId || !amount) {
+
+            showMessage(
+                "Select a member and enter an amount.",
+                false
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `/contributions/member/${memberId}?amount=${amount}`,
+                    {
+                        method: "POST"
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                const error =
+                    await response.json();
+
+                throw new Error(
+                    error.error ||
+                    "Unable to add contribution"
+                );
+
+            }
+
+
+            await response.json();
+
+
+            showMessage(
+                "Contribution added successfully.",
+                true
+            );
+
+
+            document.getElementById(
+                "contributionAmount"
+            ).value = "";
+
+
+            loadDashboard();
+
+        }
+
+        catch (error) {
+
+            showMessage(
+                error.message,
+                false
+            );
+
+        }
+
+    }
+
+
+    // =====================================================
+    // REQUEST LOAN
+    // =====================================================
+
+    async function requestLoan() {
+
+        const memberId =
+            document.getElementById(
+                "loanMember"
+            ).value;
+
+
+        const amount =
+            document.getElementById(
+                "loanAmount"
+            ).value;
+
+
+        if (!memberId || !amount) {
+
+            showMessage(
+                "Select a member and enter loan amount.",
+                false
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `/loans/member/${memberId}?amount=${amount}`,
+                    {
+                        method: "POST"
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                const error =
+                    await response.json();
+
+                throw new Error(
+                    error.error ||
+                    "Unable to request loan"
+                );
+
+            }
+
+
+            await response.json();
+
+
+            showMessage(
+                "Loan created successfully.",
+                true
+            );
+
+
+            document.getElementById(
+                "loanAmount"
+            ).value = "";
+
+
+            loadDashboard();
+
+        }
+
+        catch (error) {
+
+            showMessage(
+                error.message,
+                false
+            );
+
+        }
+
+    }
+
+
+    // =====================================================
+    // LOAD LOANS
+    // =====================================================
+
+    async function loadLoans() {
+
+        const groupId =
+            getGroupId();
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `/loans/group/${groupId}`
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to load loans"
+                );
+
+            }
+
+
+            const loans =
+                await response.json();
+
+
+            const table =
+                document.getElementById(
+                    "loanTable"
+                );
+
+
+            const repaymentSelect =
+                document.getElementById(
+                    "repaymentLoan"
+                );
+
+
+            table.innerHTML = "";
+
+            repaymentSelect.innerHTML =
+                `<option value="">Select Loan</option>`;
+
+
+            loans.forEach(loan => {
+
+
+                const row =
+                    document.createElement("tr");
+
+
+                row.innerHTML = `
+
+                    <td>${loan.id}</td>
+
+                    <td>${loan.member.name}</td>
+
+                    <td>₹${Number(
+                        loan.amount
+                    ).toFixed(2)}</td>
+
+                    <td>₹${Number(
+                        loan.outstandingAmount
+                    ).toFixed(2)}</td>
+
+                `;
+
+
+                table.appendChild(row);
+
+
+                // Only show unpaid loans for repayment
+
+                if (
+                    Number(loan.outstandingAmount) > 0
+                ) {
+
+                    repaymentSelect.innerHTML += `
+
+                        <option value="${loan.id}">
+
+                            Loan #${loan.id}
+                            -
+                            ${loan.member.name}
+                            -
+                            ₹${Number(
+                                loan.outstandingAmount
+                            ).toFixed(2)}
+
+                        </option>
+
+                    `;
+
+                }
+
+            });
+
+
+            if (loans.length === 0) {
+
+                table.innerHTML = `
+
+                    <tr>
+                        <td colspan="4">
+                            No loans found
+                        </td>
+                    </tr>
+
+                `;
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+        }
+
+    }
+
+
+    // =====================================================
+    // REPAY LOAN
+    // =====================================================
+
+    async function repayLoan() {
+
+        const loanId =
+            document.getElementById(
+                "repaymentLoan"
+            ).value;
+
+
+        const amount =
+            document.getElementById(
+                "repaymentAmount"
+            ).value;
+
+
+        if (!loanId || !amount) {
+
+            showMessage(
+                "Select a loan and enter repayment amount.",
+                false
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `/repayments/loan/${loanId}?amount=${amount}`,
+                    {
+                        method: "POST"
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                const error =
+                    await response.json();
+
+                throw new Error(
+                    error.error ||
+                    "Unable to make repayment"
+                );
+
+            }
+
+
+            await response.json();
+
+
+            showMessage(
+                "Repayment successful.",
+                true
+            );
+
+
+            document.getElementById(
+                "repaymentAmount"
+            ).value = "";
+
+
+            loadDashboard();
+
+        }
+
+        catch (error) {
+
+            showMessage(
+                error.message,
+                false
+            );
+
+        }
+
+    }
+
+
+    // =====================================================
+    // LOAD WHEN PAGE OPENS
+    // =====================================================
+
+    window.onload = function() {
+
+        loadDashboard();
+
+    };
+
+</script>
+
+</body>
+</html>
