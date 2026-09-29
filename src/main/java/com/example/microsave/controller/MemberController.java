@@ -4,7 +4,7 @@ import com.example.microsave.dto.MemberSummary;
 import com.example.microsave.entity.Member;
 import com.example.microsave.service.MemberService;
 import org.springframework.web.bind.annotation.*;
-
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -20,7 +20,7 @@ public class MemberController {
     @PostMapping("/group/{groupId}")
     public Member addMember(
             @PathVariable Long groupId,
-            @RequestBody Member member) {
+            @Valid @RequestBody Member member) {
 
         return memberService.addMember(groupId, member);
     }
